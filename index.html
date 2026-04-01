@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Журнали соли хониш 2025-2026</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+<div class="container" id="printArea">
+
+    <div class="header-top">
+        <h1>📘 <span id="mainTitle">Журнали соли хониш 2025-2026</span> <small id="mainSubtitle">сентябр 2025 – май 2026</small></h1>
+        <div class="header-controls">
+            <div class="lang-switch" id="langSwitch">
+                <button class="lang-btn active" onclick="setLanguage('tg')">Тоҷикӣ</button>
+                <button class="lang-btn" onclick="setLanguage('ru')">Русский</button>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+        </div>
+    </div>
+
+    <nav class="site-nav" id="siteNav">
+        <a class="nav-link" onclick="goPage('setup')"     id="navSetup">⚙️ Танзимот</a>
+        <a class="nav-link" onclick="goPage('grades')"    id="navGrades">📝 Баҳо</a>
+        <a class="nav-link" onclick="goPage('analytics')" id="navAnalytics">📊 Таҳлил</a>
+        <a class="nav-link" onclick="goPage('calendar')"  id="navCalendar">📅 Тақвим</a>
+    </nav>
+
+    <!-- PAGE: setup -->
+    <div class="page" id="page-setup">
+        <div class="panel" id="sectionStudents">
+            <div class="panel-header">
+                <h2 id="studentsTitle">🧑‍🎓 Хонандагон</h2>
+                <div class="panel-actions">
+                    <div class="multi-lang-input">
+                        <span class="lang-indicator">tg</span>
+                        <input type="text" id="studentNameTg" placeholder="Номи пурра (тоҷикӣ)">
+                    </div>
+                    <div class="multi-lang-input">
+                        <span class="lang-indicator">ru</span>
+                        <input type="text" id="studentNameRu" placeholder="Полное имя (русский)">
+                    </div>
+                    <button onclick="addStudent()" id="addStudentBtn">➕ Илова</button>
+                    <select id="studentSelect"></select>
+                    <button class="danger" onclick="deleteStudent()" id="deleteStudentBtn">🗑 Тоза</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" id="sectionSubjects">
+            <div class="panel-header">
+                <h2 id="subjectsTitle">📚 Фанҳо</h2>
+                <div class="panel-actions">
+                    <div class="multi-lang-input">
+                        <span class="lang-indicator">tg</span>
+                        <input type="text" id="subjectNameTg" placeholder="Номи фан (тоҷикӣ)">
+                    </div>
+                    <div class="multi-lang-input">
+                        <span class="lang-indicator">ru</span>
+                        <input type="text" id="subjectNameRu" placeholder="Название предмета (русский)">
+                    </div>
+                    <button onclick="addSubject()" id="addSubjectBtn">➕ Иловаи фан</button>
+                </div>
+            </div>
+            <div id="subjectTags" class="tags-container"></div>
+        </div>
+
+        <div class="panel" id="sectionTimetable">
+            <div class="panel-header">
+                <h2 id="timetableTitle">⏰ Ҷадвали дарсӣ (душанбе–шанбе)</h2>
+                <div class="panel-actions">
+                    <input type="time" id="newTimeStart" value="08:00">
+                    <input type="time" id="newTimeEnd" value="08:45">
+                    <button onclick="addTimeSlot()" id="addTimeBtn">➕ Иловаи вақт</button>
+                </div>
+            </div>
+            <p id="timetableDesc">Барои ҳар вақт фанеро интихоб кунед.</p>
+            <div id="timetableContainer" class="timetable-grid"></div>
+        </div>
+
+        <div class="toolbar">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <button onclick="saveAllData()" id="saveBtn">💾 Захира ба хотира</button>
+                <span id="autosaveLabel" style="font-size:11px;color:var(--text-3);opacity:0;transition:opacity 0.4s;white-space:nowrap;"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: grades -->
+    <div class="page" id="page-grades">
+        <div class="quarter-tabs">
+            <button class="quarter-tab" onclick="switchQuarter('q1')" id="tabQ1">Чоряки 1</button>
+            <button class="quarter-tab" onclick="switchQuarter('q2')" id="tabQ2">Чоряки 2</button>
+            <button class="quarter-tab" onclick="switchQuarter('q3')" id="tabQ3">Чоряки 3</button>
+            <button class="quarter-tab" onclick="switchQuarter('q4')" id="tabQ4">Чоряки 4</button>
+            <button class="quarter-tab active" onclick="switchQuarter('year')" id="tabYear">Сол</button>
+            <div class="date-range">
+                <input type="date" id="dateFrom">
+                <input type="date" id="dateTo">
+                <button onclick="applyCustomDateRange()" id="filterDateBtn">Филтр</button>
+            </div>
+        </div>
+        <div class="filters-panel" style="flex-wrap:wrap;gap:15px;">
+            <div class="filter-item">
+                <label id="filterSubjectLabel">Фан:</label>
+                <select id="subjectFilter" onchange="renderGradeTable()"></select>
+            </div>
+            <div class="filter-item">
+                <label id="filterViewLabel">Намуд:</label>
+                <select id="viewType" onchange="renderGradeTable()">
+                    <option value="table">Баҳо</option>
+                    <option value="attendance">Ҳузур</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label id="studentSearchLabel">🔍 Ҷустуҷӯ:</label>
+                <input type="text" id="studentSearch" placeholder="Номи хонанда" oninput="renderGradeTableDebounced()" autocomplete="off">
+            </div>
+            <div class="filter-item" style="margin-left:auto;">
+                <button onclick="showStudentReport()" id="reportBtn" style="background:#b15656;">📄 Отчёт</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table id="mainTable">
+                <thead id="tableHeader"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="chart-container" id="sectionChart">
+            <div class="chart-header">
+                <h3 id="chartTitle">📈 Графики пешрафт ва тақсимоти баҳо</h3>
+                <select id="chartStudentSelect" onchange="updateChart()"></select>
+            </div>
+            <canvas id="gradeChart" style="width:100%;max-height:300px;"></canvas>
+        </div>
+
+        <div class="toolbar">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <button onclick="saveAllData()" id="saveBtnGrades">💾 Захира ба хотира</button>
+                <span id="autosaveLabelGrades" style="font-size:11px;color:var(--text-3);opacity:0;transition:opacity 0.4s;white-space:nowrap;"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: analytics -->
+    <div class="page" id="page-analytics">
+        <div class="report-box">
+            <div class="stat" id="statClassAvg">🏫 Миёнаи синф <span id="classAverage">0.00</span></div>
+            <div class="stat" id="statAttendance">📊 Фоизи ҳузур <span id="attendancePercentage">0%</span></div>
+            <div class="stat" id="statStudents">👥 Хонандагон <span id="totalStudents">0</span></div>
+            <div class="stat" id="statDays">📆 Рӯзҳо <span id="totalDays">0</span></div>
+        </div>
+        <div class="chart-container" id="rankingSection">
+            <div class="chart-header">
+                <h3 id="rankingTitle">🏆 Рейтинги хонандагон</h3>
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    <select id="rankingSubjectSelect" onchange="updateRankingChart()"></select>
+                    <button id="rankingAllBtn" onclick="switchRankingMode('all')" style="padding:8px 18px;font-size:14px;">🌐 Умумӣ</button>
+                </div>
+            </div>
+            <div style="position:relative;width:100%;"><canvas id="rankingChart"></canvas></div>
+        </div>
+        <div class="chart-container" id="compareSection">
+            <div class="chart-header">
+                <h3 id="compareTitle">📊 Муқоисаи хонандагон</h3>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                    <select id="compareStudent1Select" onchange="onCompareChange()"></select>
+                    <span style="font-weight:700;color:var(--text-3);font-size:18px;">vs</span>
+                    <select id="compareStudent2Select" onchange="onCompareChange()"></select>
+                </div>
+            </div>
+            <div id="compareNoData" style="text-align:center;color:var(--text-3);padding:24px 0;font-size:14px;"></div>
+            <div style="position:relative;width:100%;"><canvas id="compareChart"></canvas></div>
+        </div>
+
+        <div class="toolbar">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <button onclick="saveAllData()" id="saveBtnAnalytics">💾 Захира ба хотира</button>
+                <span id="autosaveLabelAnalytics" style="font-size:11px;color:var(--text-3);opacity:0;transition:opacity 0.4s;white-space:nowrap;"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: calendar -->
+    <div class="page" id="page-calendar">
+        <div class="chart-container" id="calendarSection">
+            <div class="chart-header">
+                <h3 id="calendarTitle">📅 Тақвим</h3>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <button onclick="prevMonth()" style="padding:7px 16px;font-size:14px;">‹</button>
+                    <span id="calendarMonthLabel" style="font-weight:700;font-size:15px;min-width:140px;text-align:center;color:var(--text);"></span>
+                    <button onclick="nextMonth()" style="padding:7px 16px;font-size:14px;">›</button>
+                </div>
+            </div>
+            <div id="calendarGrid" class="calendar-grid"></div>
+            <div id="calendarLegend" class="calendar-legend"></div>
+        </div>
+        <div class="toolbar">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <button onclick="saveAllData()" id="saveBtnCal">💾 Захира ба хотира</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="toast-container"></div>
+
+<div id="reportModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modalTitle" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:1000;">
+    <div role="document" style="background:var(--panel);border-radius:30px;padding:30px;max-width:600px;width:90%;max-height:80%;overflow-y:auto;border:1px solid var(--panel-border);">
+        <h2 id="modalTitle">📋 Ҳисоботи хонанда</h2>
+        <div id="modalContent"></div>
+        <button onclick="closeModal()" id="modalCloseBtn" style="margin-top:20px;">Пӯшидан</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
