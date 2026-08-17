@@ -1,1 +1,1 @@
-{"name":"School Journal Pro","short_name":"Journal","start_url":"./portal.html","display":"standalone","background_color":"#eef2f7","theme_color":"#1a5fb4","icons":[]}
+{"name":"School Journal Pro","short_name":"Journal","start_url":"./portal.html","scope":"./","display":"standalone","background_color":"#eef2f7","theme_color":"#1a5fb4","description":"Электронный школьный журнал","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}

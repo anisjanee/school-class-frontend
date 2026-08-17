@@ -1,0 +1,1 @@
+{"name":"school-journal-backend","version":"1.0.0","private":true,"type":"module","engines":{"node":">=20"},"scripts":{"dev":"node --watch server.js","start":"node server.js"},"dependencies":{"bcryptjs":"^3.0.2","better-sqlite3":"^12.4.1","cors":"^2.8.5","dotenv":"^17.2.1","express":"^5.1.0","jsonwebtoken":"^9.0.2","pdfkit":"^0.17.2","web-push":"^3.6.7"}}
