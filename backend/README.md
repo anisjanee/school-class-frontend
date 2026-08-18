@@ -1,64 +1,83 @@
-# School Journal Pro Backend
+# School Journal Pro Backend v3
 
-Локальный backend для `portal.html`.
+Локальный FastAPI + SQLite backend для `portal.html`.
 
-## 1. Установка
-
-Нужен Python 3.10+.
+## Запуск
 
 ```bash
 cd backend
-python -m venv .venv
-```
-
-Windows:
-
-```bash
-.venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-## 2. Запуск
-
-```bash
 uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-API будет доступен на `http://127.0.0.1:8000`.
-Документация: `http://127.0.0.1:8000/docs`.
+Windows PowerShell:
 
-## 3. Frontend
+```powershell
+cd backend
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn main:app --reload --host 127.0.0.1 --port 8000
+```
 
-Открой проект через VS Code Live Server или другой локальный HTTP-сервер и открой `portal.html`.
+API: `http://127.0.0.1:8000`
 
-По умолчанию frontend использует:
+Swagger: `http://127.0.0.1:8000/docs`
+
+## Frontend
+
+В корне проекта:
+
+```bash
+python3 -m http.server 5500
+```
+
+Открой `http://127.0.0.1:5500/portal.html`.
+
+`portal.html` подключает `portal.js` обычным script, поэтому inline-кнопки авторизации работают корректно.
+
+## Администратор
+
+При первом запуске backend автоматически создаётся:
 
 ```text
-http://127.0.0.1:8000
+Email: admin@school.local
+Пароль: Admin123!
 ```
 
-Если backend запущен на другом адресе, перед `portal.js` можно задать:
+Администратор может:
 
-```html
-<script>window.SCHOOL_API_URL = 'http://127.0.0.1:8000';</script>
-<script type="module" src="portal.js"></script>
+- создавать и удалять учителей, учеников и родителей;
+- включать/отключать аккаунты;
+- менять пароли;
+- привязывать родителя к ученику;
+- добавлять и изменять учеников;
+- создавать предметы и назначать учителей;
+- полностью изменять расписание;
+- управлять оценками;
+- управлять домашними заданиями;
+- отправлять сообщения;
+- создавать уведомления.
+
+## Демо-аккаунты
+
+```text
+Учитель:  teacher@demo.local / 1234
+Ученик:   student@demo.local / 1234
+Родитель: parent@demo.local / 1234
 ```
 
-## Demo-аккаунты
+## База данных
 
-- Учитель: `teacher@demo.local` / `1234`
-- Ученик: `student@demo.local` / `1234`
-- Родитель: `parent@demo.local` / `1234`
+Используется SQLite: `backend/school.db`.
 
-## Что хранится на backend
+При обновлении со старой версии таблица пользователей автоматически мигрируется на новую схему с ролью `admin`. Существующие пользователи и данные сохраняются.
 
-- пользователи и роли;
-- ученики;
-- предметы;
-- оценки 1–10;
-- комментарии к оценкам;
-- уведомления;
-- серверные сессии;
-- SQLite-база `school.db`.
+## Роли
 
-Frontend больше не хранит авторизацию и данные кабинета в качестве основной базы: запросы идут через REST API.
+- `admin` — полный контроль системы;
+- `teacher` — оценки, домашние задания, просмотр учеников и расписания;
+- `student` — свои оценки, расписание, домашние задания и сообщения;
+- `parent` — данные привязанного ребёнка, расписание, домашние задания и сообщения.
