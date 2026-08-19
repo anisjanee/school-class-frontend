@@ -3,7 +3,7 @@
 body{background:radial-gradient(circle at 8% 4%,rgba(91,124,255,.12),transparent 28%),radial-gradient(circle at 92% 92%,rgba(139,92,246,.11),transparent 30%),#f5f7ff}
 .login-card{animation:enhanceIn .55s cubic-bezier(.2,.8,.2,1);box-shadow:0 30px 100px rgba(52,65,120,.16)}
 .login-card input,.modal input,.modal select,.modal textarea,.compose select,.compose textarea{background:rgba(255,255,255,.92)}
-.big-button,.primary{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--accent2));}
+.big-button,.primary{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--accent2))}
 .big-button:before,.primary:before{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.32),transparent 65%);transform:translateX(-120%);transition:transform .65s ease}.big-button:hover:before,.primary:hover:before{transform:translateX(120%)}
 .sidebar{box-shadow:8px 0 30px rgba(48,61,105,.035)}
 .brand i,.logo-mark{position:relative;overflow:hidden}.brand i:after,.logo-mark:after{content:"";position:absolute;inset:-40%;background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.5),transparent 65%);transform:translateX(-70%) rotate(15deg);animation:enhanceShine 4s ease-in-out infinite}
@@ -13,7 +13,33 @@ main>header{border-bottom:1px solid rgba(228,232,242,.7)}
 .hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:10%;top:-80px;background:rgba(255,255,255,.28);filter:blur(2px);pointer-events:none}
 .stat,.panel,.subject-card,.cards article{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}.stat:hover,.panel:hover,.subject-card:hover,.cards article:hover{border-color:rgba(91,124,255,.22)}
 .table-wrap{box-shadow:0 8px 24px rgba(48,61,105,.035)}tbody tr{transition:background .16s ease,transform .16s ease}tbody tr:hover{background:#f7f9ff}
-.scores button{position:relative;overflow:hidden}.scores button.selected{animation:enhancePop .22s ease}
+
+/* Расписание: визуальная сетка учебной недели */
+.week{background:rgba(255,255,255,.45);padding:8px;border:1px solid #e7ebf3;border-radius:22px}
+.day{background:linear-gradient(180deg,#f9faff,#f4f6fb);border:1px solid #e8ebf3;box-shadow:inset 0 1px rgba(255,255,255,.9);transition:transform .22s ease,box-shadow .22s ease}
+.day:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(64,78,125,.1)}
+.day>header{border-bottom:1px solid #e8ebf3!important;margin-bottom:7px;padding-bottom:10px!important}
+.day>header b{font-size:12px;color:#35415a}
+.day article{border:1px solid #e5e9f2;background:linear-gradient(135deg,#fff,#f8f9ff);box-shadow:0 7px 18px rgba(67,80,119,.07);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.day article:hover{transform:translateX(3px);border-color:#cbd5ff;box-shadow:0 10px 24px rgba(78,97,164,.13)}
+.day article b{color:#2f3b55}.day article small:first-child{color:#6278d9;font-weight:800}
+
+/* Оценки: крупные и понятные оценки */
+.grade-help{background:linear-gradient(135deg,#f1f5ff,#f7f1ff);border:1px solid #e1e6fa;box-shadow:0 8px 24px rgba(77,95,153,.06)}
+.scores{background:#f7f8fc;border:1px solid #e7eaf2;border-radius:20px;padding:12px;grid-template-columns:repeat(5,minmax(52px,1fr))}
+.scores button{height:62px;background:#fff;border:1px solid #e5e9f2;box-shadow:0 5px 12px rgba(57,70,108,.06);font-size:21px;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.scores button:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(72,88,140,.12);background:#f3f6ff}
+.scores button.selected{background:linear-gradient(135deg,#547fff,#865dff);border-color:transparent;color:#fff;box-shadow:0 12px 25px rgba(86,105,220,.28)}
+.grade{box-shadow:0 5px 12px rgba(62,77,123,.08);transition:transform .16s ease}.grade:hover{transform:scale(1.08)}
+
+/* Сообщения: чат вместо обычного списка */
+.compose{background:linear-gradient(135deg,#f8f9ff,#f4f1ff);border:1px solid #e5e9f4;border-radius:20px;padding:14px;box-shadow:0 8px 25px rgba(57,70,113,.06)}
+.compose select,.compose textarea{border-color:#e0e5f0;background:#fff}
+.bubble{position:relative;max-width:min(72%,620px);padding:14px 16px;border:1px solid #e3e7f1;background:#fff;box-shadow:0 8px 20px rgba(59,73,116,.07);transition:transform .18s ease,box-shadow .18s ease}
+.bubble:hover{transform:translateY(-2px);box-shadow:0 12px 25px rgba(59,73,116,.1)}
+.bubble.mine{background:linear-gradient(135deg,#eef1ff,#f4efff);border-color:#dfe3ff}
+.bubble p{font-size:13px;line-height:1.55}.bubble small{font-size:10px}
+
 .modal-bg{animation:enhanceFade .2s ease}.modal{animation:enhanceModal .25s cubic-bezier(.2,.8,.2,1);border:1px solid rgba(255,255,255,.9)}
 .toast.show{box-shadow:0 18px 40px rgba(23,32,51,.22)}
 @keyframes enhanceIn{from{opacity:0;transform:translateY(20px) scale(.98)}to{opacity:1;transform:none}}
@@ -21,5 +47,6 @@ main>header{border-bottom:1px solid rgba(228,232,242,.7)}
 @keyframes enhanceFade{from{opacity:0}to{opacity:1}}
 @keyframes enhancePop{from{transform:scale(.94)}to{transform:scale(1)}}
 @keyframes enhanceShine{0%,55%{transform:translateX(-75%) rotate(15deg)}80%,100%{transform:translateX(75%) rotate(15deg)}}
-@media(max-width:760px){.login-card{padding:30px 24px}.hero{padding:25px;min-height:180px}.hero h2{font-size:25px}.content{padding-left:18px;padding-right:18px}.compose{grid-template-columns:1fr}.week{gap:8px}.day{min-height:150px}}
-@media(prefers-reduced-motion:reduce){.brand i:after,.logo-mark:after{animation:none}.login-card,.modal,.modal-bg{animation:none}.big-button:before,.primary:before{display:none}}
+@media(max-width:760px){.login-card{padding:30px 24px}.hero{padding:25px;min-height:180px}.hero h2{font-size:25px}.content{padding-left:18px;padding-right:18px}.compose{grid-template-columns:1fr}.week{grid-template-columns:repeat(2,1fr);gap:8px}.day{min-height:150px}.bubble{max-width:88%}.scores{grid-template-columns:repeat(5,1fr);padding:8px}.scores button{height:52px}}
+@media(max-width:480px){.week{grid-template-columns:1fr}.day{min-height:120px}}
+@media(prefers-reduced-motion:reduce){.brand i:after,.logo-mark:after{animation:none}.login-card,.modal,.modal-bg{animation:none}.big-button:before,.primary:before{display:none}.day,.day article,.bubble,.grade{transition:none}}
