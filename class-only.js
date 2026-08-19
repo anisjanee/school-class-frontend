@@ -2,6 +2,7 @@
   const CLASS_NAME = '10-А';
   window.SCHOOL_CLASS = CLASS_NAME;
 
+  // Ограничиваем все записи frontend одним классом.
   const originalFetch = window.fetch.bind(window);
   window.fetch = async (input, init = {}) => {
     let body = init.body;
@@ -10,7 +11,7 @@
         const data = JSON.parse(body);
         const url = typeof input === 'string' ? input : input.url;
         if (/\/api\/(users|students|schedule|homework)(\/|$)/.test(url) && data && typeof data === 'object') {
-          if ('class_name' in data || /\/api\/(users|students|schedule|homework)$/.test(url)) data.class_name = CLASS_NAME;
+          data.class_name = CLASS_NAME;
           init = { ...init, body: JSON.stringify(data) };
         }
       } catch (_) {}
@@ -39,24 +40,27 @@
     }
   };
 
-  const applyClassUI = () => {
-    document.title = '10-А · Электронный дневник';
+  // ВАЖНО: здесь больше нет MutationObserver.
+  // Старый observer бесконечно менял document.title, сам себя запускал снова
+  // и из-за этого браузер зависал на странице portal.html.
+  function applyClassUI() {
+    if (document.title !== '10-А · Электронный дневник') {
+      document.title = '10-А · Электронный дневник';
+    }
+
     document.querySelectorAll('input[id="uc"], input[id="sc"], input[id="hc"]').forEach(el => {
       el.value = CLASS_NAME;
       el.readOnly = true;
       el.placeholder = CLASS_NAME;
       el.setAttribute('aria-label', 'Класс: 10-А');
     });
-    document.querySelectorAll('input, select').forEach(el => {
-      if (el.value === '10-А') el.value = CLASS_NAME;
-    });
-    document.querySelectorAll('body *').forEach(el => {
-      if (el.children.length === 0 && el.textContent.trim() === 'Школьный журнал') {
-        el.textContent = '10-А · Электронный дневник';
-      }
-    });
-  };
+  }
 
-  new MutationObserver(applyClassUI).observe(document.documentElement, { childList: true, subtree: true });
-  window.addEventListener('load', applyClassUI);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyClassUI, { once: true });
+  } else {
+    applyClassUI();
+  }
+
+  window.applySchoolClassUI = applyClassUI;
 })();
