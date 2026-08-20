@@ -1,8 +1,9 @@
 (() => {
+  // Внутренне проект работает только с одним классом.
+  // Название класса не показывается пользователю в интерфейсе.
   const CLASS_NAME = '10-А';
   window.SCHOOL_CLASS = CLASS_NAME;
 
-  // Ограничиваем все записи frontend одним классом.
   const originalFetch = window.fetch.bind(window);
   window.fetch = async (input, init = {}) => {
     let body = init.body;
@@ -29,38 +30,56 @@
       if (Array.isArray(payload.schedule)) payload.schedule = payload.schedule.filter(sameClass);
       if (Array.isArray(payload.homework)) payload.homework = payload.homework.filter(sameClass);
       if (Array.isArray(payload.subjects)) payload.subjects = payload.subjects.filter(s => !s.class_name || sameClass(s));
-
-      return new Response(JSON.stringify(payload), {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers
-      });
+      return new Response(JSON.stringify(payload), { status: response.status, statusText: response.statusText, headers: response.headers });
     } catch (_) {
       return response;
     }
   };
 
-  // ВАЖНО: здесь больше нет MutationObserver.
-  // Старый observer бесконечно менял document.title, сам себя запускал снова
-  // и из-за этого браузер зависал на странице portal.html.
-  function applyClassUI() {
-    if (document.title !== '10-А · Электронный дневник') {
-      document.title = '10-А · Электронный дневник';
-    }
+  // Пользовательский интерфейс намеренно не показывает название класса.
+  // Ограничение класса остаётся внутренним правилом backend/frontend.
+  function hideInternalClassLabel() {
+    if (document.title.includes(CLASS_NAME)) document.title = 'Электронный дневник';
 
     document.querySelectorAll('input[id="uc"], input[id="sc"], input[id="hc"]').forEach(el => {
-      el.value = CLASS_NAME;
+      el.value = '';
+      el.placeholder = 'Класс';
       el.readOnly = true;
-      el.placeholder = CLASS_NAME;
-      el.setAttribute('aria-label', 'Класс: 10-А');
+      el.setAttribute('aria-label', 'Класс');
+    });
+
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    let node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeValue && node.nodeValue.includes(CLASS_NAME)) nodes.push(node);
+    }
+    nodes.forEach(textNode => {
+      textNode.nodeValue = textNode.nodeValue.split(CLASS_NAME).join('');
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyClassUI, { once: true });
-  } else {
-    applyClassUI();
+  let scheduled = false;
+  let observer;
+  function scheduleHide() {
+    if (scheduled) return;
+    scheduled = true;
+    queueMicrotask(() => {
+      scheduled = false;
+      observer?.disconnect();
+      hideInternalClassLabel();
+      observer?.observe(document.body, { childList: true, subtree: true });
+    });
   }
 
-  window.applySchoolClassUI = applyClassUI;
+  function start() {
+    hideInternalClassLabel();
+    observer = new MutationObserver(scheduleHide);
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+  else start();
+
+  window.applySchoolClassUI = hideInternalClassLabel;
 })();
