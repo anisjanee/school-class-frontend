@@ -1,6 +1,6 @@
 (() => {
   // Внутренне проект работает только с одним классом.
-  // Название класса не показывается пользователю в интерфейсе.
+  // Название класса никогда не показывается пользователю.
   const CLASS_NAME = '10-А';
   window.SCHOOL_CLASS = CLASS_NAME;
 
@@ -25,10 +25,9 @@
     try {
       const payload = await response.clone().json();
       const sameClass = item => !item || !item.class_name || item.class_name === CLASS_NAME;
-      if (Array.isArray(payload.students)) payload.students = payload.students.filter(sameClass);
-      if (Array.isArray(payload.all_students)) payload.all_students = payload.all_students.filter(sameClass);
-      if (Array.isArray(payload.schedule)) payload.schedule = payload.schedule.filter(sameClass);
-      if (Array.isArray(payload.homework)) payload.homework = payload.homework.filter(sameClass);
+      for (const key of ['students', 'all_students', 'schedule', 'homework']) {
+        if (Array.isArray(payload[key])) payload[key] = payload[key].filter(sameClass);
+      }
       if (Array.isArray(payload.subjects)) payload.subjects = payload.subjects.filter(s => !s.class_name || sameClass(s));
       return new Response(JSON.stringify(payload), { status: response.status, statusText: response.statusText, headers: response.headers });
     } catch (_) {
@@ -36,50 +35,21 @@
     }
   };
 
-  // Пользовательский интерфейс намеренно не показывает название класса.
-  // Ограничение класса остаётся внутренним правилом backend/frontend.
+  // Убираем название внутреннего класса из динамически созданного интерфейса.
   function hideInternalClassLabel() {
-    if (document.title.includes(CLASS_NAME)) document.title = 'Электронный дневник';
-
     document.querySelectorAll('input[id="uc"], input[id="sc"], input[id="hc"]').forEach(el => {
       el.value = '';
       el.placeholder = 'Класс';
       el.readOnly = true;
       el.setAttribute('aria-label', 'Класс');
     });
-
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    const nodes = [];
-    let node;
-    while ((node = walker.nextNode())) {
-      if (node.nodeValue && node.nodeValue.includes(CLASS_NAME)) nodes.push(node);
-    }
-    nodes.forEach(textNode => {
-      textNode.nodeValue = textNode.nodeValue.split(CLASS_NAME).join('');
-    });
   }
 
-  let scheduled = false;
-  let observer;
-  function scheduleHide() {
-    if (scheduled) return;
-    scheduled = true;
-    queueMicrotask(() => {
-      scheduled = false;
-      observer?.disconnect();
-      hideInternalClassLabel();
-      observer?.observe(document.body, { childList: true, subtree: true });
-    });
-  }
-
-  function start() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hideInternalClassLabel, { once: true });
+  } else {
     hideInternalClassLabel();
-    observer = new MutationObserver(scheduleHide);
-    observer.observe(document.body, { childList: true, subtree: true });
   }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
-  else start();
 
   window.applySchoolClassUI = hideInternalClassLabel;
 })();
